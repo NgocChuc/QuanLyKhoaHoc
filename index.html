@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management System Course</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f4f4f4;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            background-color: black; 
+            padding: 10px 20px; 
+            color: white; 
+        }
+
+        .dropdown {
+            display: inline-block;
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .dropdown button {
+            background-color: #808080;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ADD8E6;
+        }
+
+        .dropdown:hover button {
+            background-color: #4682B4;
+        }
+
+        h1 {
+            margin: 0; 
+            padding-left: 20px; 
+        }
+
+        .parent {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .input, .select, .textarea, button {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #000000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4682B4;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px; 
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px; 
+            border-radius: 5px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .add-button, .edit-button {
+            background-color: #000000;
+            color: white;
+            padding: 5px 10px; 
+            font-size: 14px; 
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-left: 5px;
+            transition: background-color 0.3s ease;
+            width: 120px; 
+            height: 40px; 
+            border-radius: 4px; 
+            
+        }
+        .button-container {
+    display: flex; /* Sử dụng flexbox */
+    
+    margin-top: 10px; /* Khoảng cách phía trên */
+}
+
+
+        .course-select {
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="dropdown">
+        <button>Menu</button>
+        <div class="dropdown-content">
+            <a href="#" id="detailPage">Chi tiết Khóa Học</a>
+            <a href="#">Item 2</a>
+            <a href="#">Item 3</a>
+        </div>
+    </div>
+
+    <h1>Management System Course</h1>
+</div>
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeDetailModal">&times;</span>
+        <h2>Chi tiết Khóa Học</h2>
+        <p><strong>ID Môn Học:</strong> <span id="detailCourseId"></span></p>
+        <p><strong>Tên Môn Học:</strong> <span id="detailCourseName"></span></p>
+        <p><strong>Mô Tả:</strong> <span id="detailCourseDescription"></span></p>
+        <p><strong>Người Tạo:</strong> <span id="detailCreatedBy"></span></p>
+        <p><strong>Thời Gian Tạo:</strong> <span id="detailCreatedAt"></span></p>
+        <p><strong>Thời Gian Cập Nhật:</strong> <span id="detailUpdatedAt"></span></p>
+    </div>
+</div>
+
+
+<div class="container">
+    <p>This is a paragraph.</p>
+
+    <div class="parent">
+        <input class="input" type="text" placeholder="Tìm môn học" maxlength="255" required />
+        <button name="button" type="button">Tìm kiếm</button>
+
+        <select class="select" required>
+            <option value="">Chọn giảng viên</option>
+            <option value="gv1">Giảng viên 1</option>
+            <option value="gv2">Giảng viên 2</option>
+            <option value="gv3">Giảng viên 3</option>
+            <option value="gv4">Giảng viên 4</option>
+            <option value="gv5">Giảng viên 5</option>
+            <option value="gv6">Giảng viên 6</option>
+        </select>
+
+        <textarea class="textarea" placeholder="Mô tả chi tiết về khóa học" rows="5" cols="20"></textarea>
+    </div>
+</div>
+    <p style="font-size: 24px; font-weight: bold;">Bảng Chi Tiết Các Môn Học</p>
+<div class="button-container">
+    <!-- Nút thêm môn học -->
+    <button class="add-button" id="addButton">Thêm môn học</button>
+
+    <!-- Nút chỉnh sửa môn học -->
+    <button class="add-button" id="editButton">Chỉnh sửa môn học</button>
+    
+    <button class="add-button" id="deleteButton">Xóa môn học</button>
+</div>
+    <h2>Bảng Dữ Liệu Môn Học</h2>
+    <table id="courseTable">
+        <tr>
+            <td>001</td>
+            <td>Toán Cao Cấp</td>
+            <td>Nguyễn Văn A</td>
+            <td>2024-01-10 08:00:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Khóa học này tập trung vào đại số tuyến tính.</td>
+        </tr>
+        <tr>
+            <td>002</td>
+            <td>Lập Trình Web</td>
+            <td>Trần Thị B</td>
+            <td>2024-02-15 10:30:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Học về HTML, CSS, JavaScript và các framework.</td>
+        </tr>
+        <tr>
+            <td>003</td>
+            <td>Cơ Sở Dữ Liệu</td>
+            <td>Phạm Văn C</td>
+            <td>2024-03-20 14:00:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Giới thiệu về cơ sở dữ liệu và SQL.</td>
+        </tr>
+        <tr>
+            <td>004</td>
+            <td>Hệ Thống Thông Tin</td>
+            <td>Lê Thị D</td>
+            <td>2024-04-25 16:15:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Phân tích và thiết kế hệ thống thông tin.</td>
+        </tr>
+        <tr>
+            <td>005</td>
+            <td>Khoa Học Máy Tính</td>
+            <td>Đặng Văn E</td>
+            <td>2024-05-30 11:45:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Khám phá các khái niệm cơ bản của máy tính.</td>
+        </tr>
+        <tr>
+            <td>006</td>
+            <td>Mạng Máy Tính</td>
+            <td>Nguyễn Thị F</td>
+            <td>2024-06-10 12:00:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Tìm hiểu về các loại mạng và giao thức.</td>
+        </tr>
+        <tr>
+            <td>007</td>
+            <td>Thiết Kế Đồ Họa</td>
+            <td>Vũ Văn G</td>
+            <td>2024-07-05 09:30:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Học về nguyên tắc thiết kế và phần mềm đồ họa.</td>
+        </tr>
+        <tr>
+            <td>008</td>
+            <td>Kinh Tế Vi Mô</td>
+            <td>Trần Văn H</td>
+            <td>2024-08-12 13:15:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Nghiên cứu về các nguyên lý kinh tế cơ bản.</td>
+        </tr>
+        <tr>
+            <td>009</td>
+            <td>Tâm Lý Học</td>
+            <td>Phan Thị I</td>
+            <td>2024-09-01 15:00:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Hiểu biết về tâm lý con người và hành vi xã hội.</td>
+        </tr>
+        <tr>
+            <td>010</td>
+            <td>Nguyên Lý Kế Toán</td>
+            <td>Lê Văn J</td>
+            <td>2024-09-10 17:00:00</td>
+            <td>2024-09-28 09:00:00</td>
+            <td>Cơ bản về kế toán tài chính và báo cáo tài chính.</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Modal thêm môn học -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Thêm Môn Học</h2>
+        <input class="input" id="courseId" type="text" placeholder="ID Môn Học" required />
+        <input class="input" id="courseName" type="text" placeholder="Tên Môn Học" required />
+        <textarea class="textarea" id="courseDescription" placeholder="Mô Tả Chi Tiết" rows="5" cols="20"></textarea>
+        <input class="input" id="createdBy" type="text" placeholder="Người Tạo" required />
+        <button id="createButton">Tạo</button>
+    </div>
+</div>
+
+
+<!-- Modal Chọn Khóa Học Để Chỉnh Sửa -->
+<div id="selectModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeSelectModal">&times;</span>
+        <h2>Chọn Khóa Học Để Chỉnh Sửa</h2>
+        <div id="courseSelectContainer"></div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeEditModal">&times;</span>
+        <h2>Chỉnh Sửa Môn Học</h2>
+        <label>ID Môn Học:</label>
+        <input class="input" id="editCourseId" type="text" readonly />
+        <label>Tên Môn Học:</label>
+        <input class="input" id="editCourseName" type="text" required />
+        <label>Mô Tả:</label>
+        <textarea class="textarea" id="editCourseDescription" rows="6" cols="20" required></textarea>
+        <label>Người Tạo:</label>
+        <input class="input" id="editCreatedBy" type="text" required />
+        <button id="updateButton">Cập Nhật</button>
+    </div>
+</div>
+
+
+
+	<!-- Modal chọn khóa học để xóa -->
+<div id="selectCourseModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeSelectCourseModal">&times;</span>
+        <h2>Chọn Khóa Học Để Xóa</h2>
+        <select id="courseSelectDelete" class="select"></select>
+        <button id="confirmSelectCourseButton">Xóa</button>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div id="confirmDeleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeConfirmDeleteModal">&times;</span>
+        <h2>Bạn có chắc chắn muốn xóa khóa học này không?</h2>
+        <button id="deleteConfirmedButton">Có</button>
+        <button id="cancelDeleteButton">Không</button>
+    </div>
+</div>
+
+<script>
+    // trang xem chi tiết các khóa học
+    
+    var modal = document.getElementById("myModal");
+    var selectModal = document.getElementById("selectModal");
+    var editModal = document.getElementById("editModal");
+
+    var btn = document.getElementById("addButton");
+    var closeBtns = document.getElementsByClassName("close");
+
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    for (var i = 0; i < closeBtns.length; i++) {
+        closeBtns[i].onclick = function() {
+            modal.style.display = "none";
+            selectModal.style.display = "none";
+            editModal.style.display = "none";
+        }
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal || event.target == selectModal || event.target == editModal) {
+            modal.style.display = "none";
+            selectModal.style.display = "none";
+            editModal.style.display = "none";
+        }
+    }
+
+    document.getElementById("createButton").onclick = function() {
+    var courseId = document.getElementById("courseId").value;
+    var courseName = document.getElementById("courseName").value;
+    var courseDescription = document.getElementById("courseDescription").value;
+    var createdBy = document.getElementById("createdBy").value;
+    var now = new Date();
+
+    if (courseId && courseName && createdBy) {
+        var table = document.getElementById("courseTable");
+        var row = table.insertRow(-1); // Thêm hàng mới
+
+        row.insertCell(0).innerText = courseId; // ID Môn Học
+        row.insertCell(1).innerText = courseName; // Tên Môn Học
+        row.insertCell(2).innerText = createdBy; // Người Tạo
+        row.insertCell(3).innerText = now.toLocaleDateString(); // Thời Gian Tạo
+        row.insertCell(4).innerText = now.toLocaleDateString(); // Thời Gian Cập Nhật
+
+        modal.style.display = "none"; // Đóng modal
+        // Xóa thông tin đã nhập
+        document.getElementById("courseId").value = '';
+        document.getElementById("courseName").value = '';
+        document.getElementById("courseDescription").value = '';
+        document.getElementById("createdBy").value = '';
+    } else {
+        alert("Vui lòng nhập đầy đủ thông tin.");
+    }
+}
+
+// Cập nhật Hàm Chọn Khóa Học Để Chỉnh Sửa
+document.getElementById("editButton").onclick = function() {
+    selectModal.style.display = "block"; // Hiển thị modal chọn
+    populateCourseSelect(); // Tải danh sách môn học
+}
+
+function populateCourseSelect() {
+    var table = document.getElementById("courseTable");
+    var courseSelectContainer = document.getElementById("courseSelectContainer");
+    courseSelectContainer.innerHTML = ''; // Xóa các tùy chọn trước đó
+
+    for (var i = 1; i < table.rows.length; i++) { // Bắt đầu từ 1 để bỏ qua tiêu đề
+        var courseName = table.rows[i].cells[1].innerText; // Tên môn học
+
+        var courseOption = document.createElement("button");
+        courseOption.innerText = courseName;
+        courseOption.style.width = "100%"; 
+        courseOption.style.margin = "5px 0"; 
+        courseOption.setAttribute("data-row", i); // Lưu trữ chỉ số hàng
+        courseOption.onclick = function() {
+            var selectedRow = this.getAttribute("data-row"); // Lấy chỉ số hàng
+            var cells = table.rows[selectedRow].getElementsByTagName("td");
+
+            document.getElementById("editCourseId").value = cells[0].innerText; // ID Môn Học
+            document.getElementById("editCourseName").value = cells[1].innerText; // Tên Môn Học
+            document.getElementById("editCourseDescription").value = cells[5].innerText; // Mô tả
+            document.getElementById("editCreatedBy").value = cells[2].innerText; // Người Tạo
+            editModal.style.display = "block"; // Hiển thị modal chỉnh sửa
+            selectModal.style.display = "none"; // Ẩn modal chọn
+        }
+        courseSelectContainer.appendChild(courseOption);
+    }
+}
+
+document.getElementById("updateButton").onclick = function() {
+    var courseId = document.getElementById("editCourseId").value;
+    var courseName = document.getElementById("editCourseName").value;
+    var courseDescription = document.getElementById("editCourseDescription").value;
+    var createdBy = document.getElementById("editCreatedBy").value;
+
+    if (courseName && createdBy) {
+        var table = document.getElementById("courseTable");
+        var selectedRow = Array.from(table.rows).findIndex(row => row.cells[0].innerText === courseId); // Lấy chỉ số hàng dựa trên ID
+
+        if (selectedRow > -1) {
+            var cells = table.rows[selectedRow].getElementsByTagName("td");
+
+            cells[1].innerText = courseName; // Cập nhật Tên Môn Học
+            cells[2].innerText = createdBy; // Cập nhật Người Tạo
+            cells[4].innerText = new Date().toLocaleDateString(); // Cập nhật Thời Gian Cập Nhật
+
+            if (courseDescription) {
+                cells[5].innerText = courseDescription; // Cập nhật mô tả
+            }
+
+            editModal.style.display = "none"; // Đóng modal
+        }
+    } else {
+        alert("Vui lòng nhập đầy đủ thông tin.");
+    }
+};
+
+
+    // Mở modal chọn môn học để xóa
+    document.getElementById("deleteButton").onclick = function() {
+        populateCourseSelectForDelete(); // Populate courses to delete
+        document.getElementById("selectCourseModal").style.display = "block";
+    };
+
+    // Hàm populate để chọn khóa học
+    function populateCourseSelectForDelete() {
+        var table = document.getElementById("courseTable");
+        var courseSelectDelete = document.getElementById("courseSelectDelete");
+        courseSelectDelete.innerHTML = ''; // Clear previous options
+
+        for (var i = 1; i < table.rows.length; i++) { // Bắt đầu từ 1 để bỏ qua header
+            var cell = table.rows[i].cells[1]; // Lấy tên môn học
+            var courseName = cell.innerText;
+
+            var option = document.createElement("option");
+            option.value = table.rows[i].cells[0].innerText; // Giá trị là ID Môn Học
+            option.text = courseName; // Hiển thị tên môn học
+            courseSelectDelete.appendChild(option);
+        }
+    }
+
+    // Xác nhận xóa
+    document.getElementById("confirmSelectCourseButton").onclick = function() {
+        document.getElementById("selectCourseModal").style.display = "none"; // Ẩn modal chọn khóa học
+        document.getElementById("confirmDeleteModal").style.display = "block"; // Hiện modal xác nhận xóa
+    };
+
+    // Xóa khóa học
+    document.getElementById("deleteConfirmedButton").onclick = function() {
+        var courseSelectDelete = document.getElementById("courseSelectDelete");
+        var selectedCourseId = courseSelectDelete.value;
+
+        var table = document.getElementById("courseTable");
+        for (var i = 1; i < table.rows.length; i++) {
+            if (table.rows[i].cells[0].innerText === selectedCourseId) {
+                table.deleteRow(i); // Xóa dòng khóa học
+                break;
+            }
+        }
+        document.getElementById("confirmDeleteModal").style.display = "none"; // Ẩn modal xác nhận
+    };
+
+    // Hủy xóa
+    document.getElementById("cancelDeleteButton").onclick = function() {
+        document.getElementById("confirmDeleteModal").style.display = "none"; // Ẩn modal xác nhận
+    };
+    
+</script>
+
+</body>
+</html>
